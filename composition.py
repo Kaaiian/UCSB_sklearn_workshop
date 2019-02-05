@@ -9,6 +9,7 @@ import collections
 import re
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot
 
 def get_sym_dict(f, factor):
     sym_dict = collections.defaultdict(float)
@@ -87,7 +88,7 @@ def _assign_features(formula, elem_props):
                 avg_feature += elem_props.loc[key].values * fractional_composition[key]
                 sum_feature += elem_props.loc[key].values * element_composition[key]
             except:
-                # print('The element:', key, 'from formula', formula,'is not currently supported in our database')
+                print('The element:', key, 'from formula', formula,'is not currently supported in our database')
                 return np.array([np.nan]*len(elem_props.iloc[0])*4)
         var_feature = elem_props.loc[list(fractional_composition.keys())].var()
         range_feature = elem_props.loc[list(fractional_composition.keys())].max()-elem_props.loc[list(fractional_composition.keys())].min()
@@ -96,8 +97,8 @@ def _assign_features(formula, elem_props):
         features = np.concatenate([avg_feature, sum_feature, np.array(var_feature), np.array(range_feature)])
         return features.transpose()
     except:
-        # print('There was and error with the Formula: '+ formula + ', this is a general exception with an unkown error')
-        return [np.nan]*len(elem_props.iloc[0])*4
+        print('There was an error with the formula: "'+ formula + '", please check the formatting')
+        return np.array([np.nan]*len(elem_props.iloc[0])*4)
 
 def generate_features(df, reset_index=True):
     '''
@@ -115,9 +116,12 @@ def generate_features(df, reset_index=True):
         Target values
     '''
 
+    # elem_props = pd.read_csv('Miedema.csv')
+    # elem_props.index = elem_props['element'].values
+    # elem_props.drop(['element'], inplace=True, axis=1)
+    # print(elem_props.head())
     elem_props = pd.read_json('element_chem.json').T
     column_names = np.concatenate(['sum_'+elem_props.columns.values,  'avg_'+elem_props.columns.values, 'var_'+elem_props.columns.values, 'range_'+elem_props.columns.values])
-
 
     # make empty list where we will store the feature vectors
     features = []

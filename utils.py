@@ -35,7 +35,7 @@ def plot_grid_search(grid):
     plt.xlabel(parameters[0])
     plt.ylabel(parameters[1])
     plt.colorbar()
-    plt.xticks(np.arange(len(param1)), param1, rotation=45)
+    plt.xticks(np.arange(len(param1)), param1.sort(), rotation=45)
     plt.yticks(np.arange(len(param2)), param2)
     plt.title('grid search')
     plt.show()
@@ -176,3 +176,13 @@ def rf_feature_importance(rf, X_train, N='all', std_deviation=False):
     plt.xlim([-1, N])
     plt.show()
     return X_train.columns.values[indices]
+
+def plot_act_vs_pred(y_actual, y_predicted):
+    plt.figure(figsize=(6,6))
+    plt.plot(y_actual, y_predicted, marker='o', mfc='none', color='#0077be', linestyle='none')
+    plt.plot([min([min(y_actual), min(y_predicted)]), max([max(y_actual), max(y_predicted)])], [min([min(y_actual), min(y_predicted)]), max([max(y_actual), max(y_predicted)])], 'k--')
+    plt.title("actual versus predicted values")
+    plt.tick_params(direction='in', length=5, bottom=True, top=True, left=True, right=True)
+    plt.xlabel('actual')
+    plt.ylabel('predicted')
+    plt.show()

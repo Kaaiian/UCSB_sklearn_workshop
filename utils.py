@@ -20,7 +20,7 @@ class MidpointNormalize(Normalize):
         x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
         return np.ma.masked_array(np.interp(value, x, y))
 
-def plot_grid_search(grid):
+def plot_grid_search(grid, midpoint=0.7):
     parameters = [x[6:] for x in list(grid.cv_results_.keys()) if 'param_' in x]
 
     param1 = list(set(grid.cv_results_['param_'+parameters[0]]))
@@ -28,15 +28,19 @@ def plot_grid_search(grid):
     scores = grid.cv_results_['mean_test_score'].reshape(len(param1),
                                                          len(param2))
 
+    param1 = [round(param, 2) for param in param1]
+    param2 = [round(param, 2) for param in param2]
+
     plt.figure(figsize=(8, 6))
     plt.subplots_adjust(left=.2, right=0.95, bottom=0.15, top=0.95)
     plt.imshow(scores, interpolation='nearest', cmap=plt.cm.hot,
-               norm=MidpointNormalize(vmin=0.2, midpoint=0.62))
-    plt.xlabel(parameters[0])
-    plt.ylabel(parameters[1])
+               norm=MidpointNormalize(vmin=0.2, midpoint=midpoint))
+    plt.xlabel(parameters[1])
+    plt.ylabel(parameters[0])
     plt.colorbar()
-    plt.xticks(np.arange(len(param1)), param1.sort(), rotation=45)
-    plt.yticks(np.arange(len(param2)), param2)
+    plt.xticks(np.arange(len(param2)), sorted(param2), rotation=90)
+    plt.yticks(np.arange(len(param1)), sorted(param1))
+
     plt.title('grid search')
     plt.show()
 

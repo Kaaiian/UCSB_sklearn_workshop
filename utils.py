@@ -9,6 +9,7 @@ from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_validate, cross_val_score, cross_val_predict, learning_curve, GridSearchCV
+from sklearn.metrics import confusion_matrix, classification_report, r2_score, mean_squared_error, auc, roc_curve
 
 class MidpointNormalize(Normalize):
 
@@ -190,3 +191,35 @@ def plot_act_vs_pred(y_actual, y_predicted):
     plt.xlabel('actual')
     plt.ylabel('predicted')
     plt.show()
+
+def get_roc_auc(actual, probability):
+        fpr, tpr, tttt = roc_curve(actual, probability, pos_label=1)
+        roc_auc = auc(fpr, tpr)
+        plt.figure(2, figsize=(3,3))
+        lw = 2
+        plt.plot(fpr, tpr, color='darkorange',
+            lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
+        plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+        plt.xlim([-0.02, 1.02])
+        plt.ylim([-0.02, 1.02])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.legend(loc="lower right")
+
+        plt.tick_params(direction='in', length=5, bottom=True, top=True, left=True, right=True)
+        plt.show()
+        return roc_auc
+    
+def get_performance_metrics(actual, predicted, probability):
+
+    tn, fp, fn, tp = confusion_matrix(actual, predicted).ravel()
+    roc_auc = get_roc_auc(actual, probability) * 100
+
+    recall = tp / (fn+tp) * 100
+    precision = tp / (tp+fp) * 100
+
+    print('precision: {:0.2f}, recall: {:0.2f}'.format(precision, recall))
+    fscore = 2  * (recall * precision) / (recall + precision)
+    print('f-score: {:0.2f}'.format(fscore))
+    ppv = tp / (tp + fp)
+    npv = tn / (tn + fn)
